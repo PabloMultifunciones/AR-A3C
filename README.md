@@ -24,12 +24,37 @@ En un alto nivel, el algoritmo A3C utiliza un esquema de actualización asincró
 5. Actualizar la red global.  
 6. Repetir.  
 
-Con estos pasos de capacitación, esperamos ver una aceleración lineal con la cantidad de agentes. Sin embargo, la cantidad de agentes que nuestra máquina puede admitir está limitada por la cantidad de núcleos de CPU disponibles. Además, A3C incluso puede escalar a más de una máquina, y algunas investigaciones más recientes (como IMPALA) admiten escalarlo aún más. ¡Mira el enlace para obtener información más detallada!
+Con estos pasos de capacitación, esperamos ver una aceleración lineal con la cantidad de agentes. Sin embargo, la cantidad de agentes que nuestra máquina puede admitir está limitada por la cantidad de núcleos de CPU disponibles. Además, A3C incluso puede escalar a más de una máquina, y algunas investigaciones más recientes (como IMPALA) admiten escalarlo aún más.
 
-### Implementacion ###
-
-Necesitamos hacer que nuestros agentes trabajen en paralelo. Primero definamos qué tipo de modelo usaremos. El agente maestro tendrá la red global y cada agente trabajador local tendrá una copia de esta red en su proceso.
+La diferencia clave con A2C es la parte asíncrona. A3C consta de múltiples agentes independientes (redes) con sus propios pesos, que interactúan con una copia diferente del entorno en paralelo. Así, pueden explorar una mayor parte del espacio de estado-accion en mucho menos tiempo.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/95035101/198832284-cdb38864-fee8-4637-aa74-c9e3641bbd1c.png">
 </p>
+
+### Implementaciones del mundo real de A3C ###
+
+A3C es un algoritmo de aprendizaje automático efectivo porque utiliza múltiples agentes para explorar el entorno, posiblemente explorando de manera más eficiente el espacio de estado (especialmente para ayudar al agente a aprender). Además, A3C utiliza una red compartida entre agentes, lo que permite que cada agente se beneficie de las experiencias de los demás en la red.
+
+A3C se ha empleado en algunas implementaciones de inteligencia artificial reconocibles. Como ilustración, se puede implementar para desarrollar un algoritmo que podría identificar objetos en imágenes con mayor precisión. Otra aplicación involucró el uso de A3C para permitir que los robots naveguen a través de entornos con técnicas para evitar la gestión de obstáculos. También tiene aplicaciones en toda la industria financiera, especialmente en ingeniería financiera: A3C podría realizar análisis predictivos en la fijación de precios.
+
+Algunos otros ejemplos del mundo real de A3C en inteligencia artificial incluyen el reconocimiento facial y la visión por computadora. El reconocimiento facial se usa para identificar ciertas personas u objetos en imágenes o videos digitales, y la visión por computadora usa algoritmos que permiten a las computadoras interpretar los detalles de una imagen, incluida la iluminación, la pose y las texturas.
+
+### Ventajas ###
+
+*Este algoritmo es más rápido y más robusto que los algoritmos estándar de aprendizaje por refuerzo.  
+*Funciona mejor que las otras técnicas de aprendizaje por refuerzo debido a la diversificación del conocimiento como se explicó anteriormente.  
+*Se puede utilizar tanto en espacios de acción discretos como continuos.  
+
+### Desventajas ###
+
+El principal inconveniente de la asincronía es que algunos agentes jugarán con una versión anterior de los parámetros. Por supuesto, la actualización puede no ocurrir de forma asíncrona sino al mismo tiempo. En ese caso, tenemos una versión mejorada de A2C con múltiples agentes en lugar de uno. A2C esperará a que todos los agentes terminen su segmento y luego actualizará los pesos de la red global y restablecerá a todos los agentes.
+
+Pero. Siempre hay un pero. Algunos argumentan que no es necesario tener muchos agentes si son sincrónicos, ya que esencialmente no son diferentes en absoluto. Y estoy de acuerdo. De hecho, lo que hacemos es crear múltiples versiones del entorno y solo dos redes.
+
+La primera red (generalmente conocida como modelo de pasos) interactúa con todos los entornos durante n pasos de tiempo en paralelo y genera un lote de experiencias. Con esa experiencia, entrenamos la segunda red (modelo de tren) y actualizamos el modelo de pasos con los nuevos pesos. Y repetimos el proceso.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/95035101/198839812-a46ad1f8-4f7d-4dc5-822c-70c2ae1beff3.jpg">
+</p>
+
